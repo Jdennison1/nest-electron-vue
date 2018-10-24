@@ -1,0 +1,49 @@
+{
+  "name": "nest-controller",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "build": "vue-cli-service build",
+    "package-mac": "electron-packager . NestController --platform darwin --arch x64 --icon ./public/macIcon.icns",
+    "package-linux": "electron-packager . NestController --platform linux --arch x64"
+  },
+  "dependencies": {
+    "axios": "^0.18.0",
+    "vue": "^2.5.17",
+    "vue-loading-spinner": "^1.0.11",
+    "vue-router": "^3.0.1"
+  },
+  "devDependencies": {
+    "@vue/cli-plugin-babel": "^3.0.3",
+    "@vue/cli-plugin-eslint": "^3.0.3",
+    "@vue/cli-service": "^3.0.3",
+    "electron": "^3.0.4",
+    "electron-packager": "^12.2.0",
+    "vue-template-compiler": "^2.5.17"
+  },
+  "eslintConfig": {
+    "root": true,
+    "env": {
+      "node": true
+    },
+    "extends": [
+      "plugin:vue/essential",
+      "eslint:recommended"
+    ],
+    "rules": {},
+    "parserOptions": {
+      "parser": "babel-eslint"
+    }
+  },
+  "postcss": {
+    "plugins": {
+      "autoprefixer": {}
+    }
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not ie <= 8"
+  ]
+}
