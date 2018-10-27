@@ -23,6 +23,8 @@ import NestService from '../services/nest.service.js';
 import {DoubleBounce} from 'vue-loading-spinner';
 const { ipcRenderer } = window.require("electron");
 const configuration = require('../../app.config.js');
+const Store = window.require('electron-store');
+const store = new Store();
 
 export default {
   name: 'NestThermostatMain',
@@ -38,16 +40,18 @@ export default {
       hvac_state: '--',
       ambient_temperature_f: '--',
       target_temperature_high_f: '--',
-      target_temperature_low_f: '--'
+      target_temperature_low_f: '--',
+      nestToken: ''
     };
   },
   created: function() {
+    this.nestToken = store.get('NestToken');
     this.getAllThermostat();
   },
   methods: {
     getAllThermostat() {
       this.loading = true;
-      NestService.getAll().then(resp => {
+      NestService.getAll(this.nestToken).then(resp => {
         this.nestResponse = resp.data;
         this.hvac_state = this.nestResponse.devices.thermostats[configuration.NestThermostatId].hvac_state;
         this.ambient_temperature_f = this.nestResponse.devices.thermostats[configuration.NestThermostatId].ambient_temperature_f;
@@ -62,7 +66,7 @@ export default {
     },
     updateSetPointLow() {
       this.loading = true;
-      NestService.updateSetPoint({
+      NestService.updateSetPoint(this.nestToken, {
         target_temperature_low_f: Number(this.lowSetPoint)
       }).then(resp => {
         if(resp.status === 200) {
@@ -72,7 +76,7 @@ export default {
     },
     updateSetPointHigh() {
       this.loading = true;
-      NestService.updateSetPoint({
+      NestService.updateSetPoint(this.nestToken, {
         target_temperature_high_f: Number(this.highSetPoint)
       }).then(resp => {
         if(resp.status === 200) {

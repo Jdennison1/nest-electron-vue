@@ -16,6 +16,9 @@
 import NestService from '../services/nest.service.js';
 const { shell } = window.require('electron');
 const configuration = require('../../app.config.js');
+const Store = window.require('electron-store');
+
+const store = new Store();
 
 export default {
   name: 'NestAuthorization',
@@ -25,10 +28,17 @@ export default {
     };
   },
   created: function() {
+    // TODO: Make this smarter and check the expiry
+    if(store.has('NestToken')) {
+      this.$router.push('thermostat');
+    }
   },
   methods: {
     authorizeNest() {
-      this.$router.push('thermostat');
+      NestService.getToken(this.authCode).then(resp => {
+        store.set('NestToken', resp.data.access_token);
+        this.$router.push('thermostat');
+      });
     },
     openAuthPage() {
       shell.openExternal(configuration.NestAuthorizationUrl);
