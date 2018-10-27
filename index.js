@@ -2,6 +2,8 @@
 
 // Modules to control application life and create native browser window
 const {app, BrowserWindow, Tray, ipcMain, nativeImage} = require('electron');
+const Store = require('electron-store');
+const store = new Store();
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -14,11 +16,12 @@ function createWindow () {
     width: 600, 
     height: 350,
     frame: false,
-    resizable: false
+    resizable: false,
+    show: !store.has('NestToken')
   });
   let icon = nativeImage.createEmpty()
   tray = new Tray(icon);
-  tray.setTitle("");
+  tray.setTitle('--℉');
 
   tray.on('click', function(event) {
     toggleWindow();
@@ -66,9 +69,10 @@ app.on('activate', function () {
 
 // Receive message on update-tray-temp channel from renderer processes
 ipcMain.on('update-tray-temp', (event, arg) => {
-  mainWindow.hide()
   tray.setTitle(arg);
 });
+
+ipcMain.on('nest-auth-complete', () => mainWindow.hide())
 
 const toggleWindow = () => {
   if (mainWindow.isVisible()) {

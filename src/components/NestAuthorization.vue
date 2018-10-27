@@ -14,8 +14,8 @@
 
 <script>
 import NestService from '../services/nest.service.js';
-const { shell } = window.require('electron');
-const configuration = require('../../app.config.js');
+import Configuration from '../../app.config.js'
+const { shell, ipcRenderer } = window.require('electron');
 const Store = window.require('electron-store');
 
 const store = new Store();
@@ -37,11 +37,12 @@ export default {
     authorizeNest() {
       NestService.getToken(this.authCode).then(resp => {
         store.set('NestToken', resp.data.access_token);
+        ipcRenderer.send('nest-auth-complete');
         this.$router.push('thermostat');
       });
     },
     openAuthPage() {
-      shell.openExternal(configuration.NestAuthorizationUrl);
+      shell.openExternal(Configuration.NestAuthorizationUrl);
     }
   }
 }

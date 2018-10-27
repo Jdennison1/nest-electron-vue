@@ -19,10 +19,10 @@
 </template>
 
 <script>
+import Configuration from '../../app.config.js';
 import NestService from '../services/nest.service.js';
-import {DoubleBounce} from 'vue-loading-spinner';
+import { DoubleBounce } from 'vue-loading-spinner';
 const { ipcRenderer } = window.require("electron");
-const configuration = require('../../app.config.js');
 const Store = window.require('electron-store');
 const store = new Store();
 
@@ -53,10 +53,10 @@ export default {
       this.loading = true;
       NestService.getAll(this.nestToken).then(resp => {
         this.nestResponse = resp.data;
-        this.hvac_state = this.nestResponse.devices.thermostats[configuration.NestThermostatId].hvac_state;
-        this.ambient_temperature_f = this.nestResponse.devices.thermostats[configuration.NestThermostatId].ambient_temperature_f;
-        this.target_temperature_high_f = this.nestResponse.devices.thermostats[configuration.NestThermostatId].target_temperature_high_f;
-        this.target_temperature_low_f = this.nestResponse.devices.thermostats[configuration.NestThermostatId].target_temperature_low_f;
+        this.hvac_state = this.nestResponse.devices.thermostats[Configuration.NestThermostatId].hvac_state;
+        this.ambient_temperature_f = this.nestResponse.devices.thermostats[Configuration.NestThermostatId].ambient_temperature_f;
+        this.target_temperature_high_f = this.nestResponse.devices.thermostats[Configuration.NestThermostatId].target_temperature_high_f;
+        this.target_temperature_low_f = this.nestResponse.devices.thermostats[Configuration.NestThermostatId].target_temperature_low_f;
         this.lowSetPoint = this.target_temperature_low_f;
         this.highSetPoint = this.target_temperature_high_f;
         // Send message from renderer process to main process through channel vue
