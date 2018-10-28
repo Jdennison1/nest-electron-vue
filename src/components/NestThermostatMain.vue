@@ -12,7 +12,7 @@
       </div>
       <button class="btn btn-success btn-md" style="width: 100%; margin-top: 5px; border-radius: 0px !important;" v-on:click="sendUpdate()">Update</button>
     </div>
-    <cube-shadow v-if="loading" background="#5CB85C" style="position: absolute; top: 70px; left: 144px;"></cube-shadow>
+    <cube-shadow v-if="loading" background="#5CB85C" style="position: absolute; top: 70px; left: 154px;"></cube-shadow>
   </div>
 </template>
 
