@@ -1,6 +1,7 @@
 <template>
   <div>
     <div v-bind:class="{inactive: loading, cooling: hvac_state === 'cooling', heating: hvac_state === 'heating'}">
+      <p style="position: absolute; top: 0; left: 3px; font-size: 14px;">{{thermostatLocation}}</p>
       <p style="font-size: 46px; text-align: center;">{{ambient_temperature_f}}℉</p>
       <div class="row mx-0">
         <div class="col-6 px-0">
@@ -10,7 +11,7 @@
           <input type='text' v-model="highSetPoint" style="color: #0BB5FF" v-bind:class="{cooling: hvac_state === 'cooling', heating: hvac_state === 'heating'}"/>
         </div>
       </div>
-      <button class="btn btn-success btn-md" style="width: 100%; margin-top: 5px; border-radius: 0px !important;" v-on:click="sendUpdate()">Update</button>
+      <button class="btn btn-success btn-md" style="width: 100%; margin-top: 5px; border-radius: 0px !important;" v-on:click="sendUpdate()">Update Thermostat Setpoint</button>
     </div>
     <cube-shadow v-if="loading" background="#5CB85C" style="position: absolute; top: 70px; left: 154px;"></cube-shadow>
   </div>
@@ -40,6 +41,7 @@ export default {
       ambient_temperature_f: '--',
       target_temperature_high_f: '--',
       target_temperature_low_f: '--',
+      thermostatLocation: '--',
       nestToken: ''
     };
   },
@@ -56,6 +58,7 @@ export default {
       NestService.getAll(this.nestToken).then(resp => {
         this.nestResponse = resp.data;
         this.hvac_state = this.nestResponse.devices.thermostats[Configuration.NestThermostatId].hvac_state;
+        this.thermostatLocation = this.nestResponse.devices.thermostats[Configuration.NestThermostatId].where_name;
         this.ambient_temperature_f = this.nestResponse.devices.thermostats[Configuration.NestThermostatId].ambient_temperature_f;
         this.target_temperature_high_f = this.nestResponse.devices.thermostats[Configuration.NestThermostatId].target_temperature_high_f;
         this.target_temperature_low_f = this.nestResponse.devices.thermostats[Configuration.NestThermostatId].target_temperature_low_f;

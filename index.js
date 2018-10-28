@@ -14,7 +14,7 @@ function createWindow () {
   // Create the browser window.
   mainWindow = new BrowserWindow({
     width: 600, 
-    height: 350,
+    height: 300,
     frame: false,
     resizable: false,
     show: !store.has('NestToken')
