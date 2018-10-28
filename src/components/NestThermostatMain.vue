@@ -9,7 +9,7 @@
         <input type='text' v-model="highSetPoint" style="color: #0BB5FF" v-bind:class="{cooling: hvac_state === 'cooling', heating: hvac_state === 'heating'}"/>
       </div>
     </div>
-    <button class="btn btn-success btn-md" style="float: right; width: 100%;" v-on:click="sendUpdate()">Update</button>
+    <button class="btn btn-success btn-md" style="width: 100%; margin-top: 5px;" v-on:click="sendUpdate()">Update</button>
     <cube-shadow v-if="loading" background="#5CB85C" style="position: absolute; top: 70px; left: 144px;"></cube-shadow>
   </div>
 </template>
@@ -42,7 +42,7 @@ export default {
     };
   },
   created: function() {
-    ipcRenderer.send('electron-window-size', 350, 165);
+    ipcRenderer.send('electron-window-size', 350, 170);
     this.nestToken = store.get('NestToken');
     this.getAllThermostat();
     const updateTask = Cron.schedule('*/15 * * * *', () => this.getAllThermostat(false));
