@@ -1,15 +1,17 @@
 <template>
-  <div v-bind:class="{inactive: loading, cooling: hvac_state === 'cooling', heating: hvac_state === 'heating'}">
-    <p style="font-size: 46px; text-align: center;">{{ambient_temperature_f}}℉</p>
-    <div class=row>
-      <div class="col-6" style="text-align: center;">
-        <input type='text' v-model="lowSetPoint" style="color: #FF8247" v-bind:class="{cooling: hvac_state === 'cooling', heating: hvac_state === 'heating'}"/>
+  <div>
+    <div v-bind:class="{inactive: loading, cooling: hvac_state === 'cooling', heating: hvac_state === 'heating'}">
+      <p style="font-size: 46px; text-align: center;">{{ambient_temperature_f}}℉</p>
+      <div class="row mx-0">
+        <div class="col-6 px-0">
+          <input type='text' v-model="lowSetPoint" style="color: #FF8247" v-bind:class="{cooling: hvac_state === 'cooling', heating: hvac_state === 'heating'}"/>
+        </div>
+        <div class="col-6 px-0">
+          <input type='text' v-model="highSetPoint" style="color: #0BB5FF" v-bind:class="{cooling: hvac_state === 'cooling', heating: hvac_state === 'heating'}"/>
+        </div>
       </div>
-      <div class="col-6" style="text-align: center;">
-        <input type='text' v-model="highSetPoint" style="color: #0BB5FF" v-bind:class="{cooling: hvac_state === 'cooling', heating: hvac_state === 'heating'}"/>
-      </div>
+      <button class="btn btn-success btn-md" style="width: 100%; margin-top: 5px; border-radius: 0px !important;" v-on:click="sendUpdate()">Update</button>
     </div>
-    <button class="btn btn-success btn-md" style="width: 100%; margin-top: 5px;" v-on:click="sendUpdate()">Update</button>
     <cube-shadow v-if="loading" background="#5CB85C" style="position: absolute; top: 70px; left: 144px;"></cube-shadow>
   </div>
 </template>
@@ -42,7 +44,7 @@ export default {
     };
   },
   created: function() {
-    ipcRenderer.send('electron-window-size', 350, 170);
+    ipcRenderer.send('electron-window-size', 350, 175);
     this.nestToken = store.get('NestToken');
     this.getAllThermostat();
     const updateTask = Cron.schedule('*/15 * * * *', () => this.getAllThermostat(false));
@@ -117,7 +119,8 @@ export default {
     border-color: transparent;
     font-size: 30px;
     font-weight: 600;
-    width: 70px;
+    width: 100%;
+    text-align: center;
   }
 
   input:focus {
