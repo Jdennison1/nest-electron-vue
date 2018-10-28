@@ -1,27 +1,24 @@
 <template>
-  <div>
-    <div v-bind:class="{inactive: loading}">
-      <h1 class="text-info">Nest Thermostat</h1>
-      <p>Current Temperature: {{ambient_temperature_f}}</p>
-      <p>System Running: {{hvac_state}}</p>
-      <p>Target AC:
-        <input type='text' v-model="highSetPoint" style="margin-left: 15px"/>
-        <button class="btn btn-primary btn-sm" v-on:click="updateSetPointHigh()" style="margin-left: 15px">Update AC Set Point</button>
-      </p>
-      <p>Target Heat:
-        <input type='text' v-model="lowSetPoint" style="margin-left: 15px"/>
-        <button class="btn btn-danger btn-sm" v-on:click="updateSetPointLow()" style="margin-left: 15px;">Update Heat Set Point</button>
-      </p>
-      <button class="btn btn-success btn-md" v-on:click="getAllThermostat()">Get Status Update</button>
+  <div v-bind:class="{inactive: loading, cooling: hvac_state === 'cooling', heating: hvac_state === 'heating'}">
+    <p style="font-size: 46px; text-align: center;">{{ambient_temperature_f}}℉</p>
+    <div class=row>
+      <div class="col-6" style="text-align: center;">
+        <input type='text' v-model="lowSetPoint" style="color: #FF8247" v-bind:class="{cooling: hvac_state === 'cooling', heating: hvac_state === 'heating'}"/>
+      </div>
+      <div class="col-6" style="text-align: center;">
+        <input type='text' v-model="highSetPoint" style="color: #0BB5FF" v-bind:class="{cooling: hvac_state === 'cooling', heating: hvac_state === 'heating'}"/>
+      </div>
     </div>
-    <double-bounce background="#197794" size="150px" v-if="loading" style="position: absolute; top: 100px; left: 200px;"></double-bounce>
+    <button class="btn btn-success btn-md" style="float: right; width: 100%;" v-on:click="sendUpdate()">Update</button>
+    <cube-shadow v-if="loading" background="#5CB85C" style="position: absolute; top: 70px; left: 144px;"></cube-shadow>
   </div>
 </template>
 
 <script>
 import Configuration from '../../app.config.js';
 import NestService from '../services/nest.service.js';
-import { DoubleBounce } from 'vue-loading-spinner';
+import { CubeShadow } from 'vue-loading-spinner';
+import Cron from 'node-cron';
 const { ipcRenderer } = window.require("electron");
 const Store = window.require('electron-store');
 const store = new Store();
@@ -29,7 +26,7 @@ const store = new Store();
 export default {
   name: 'NestThermostatMain',
   components: {
-    DoubleBounce
+    CubeShadow
   },
   data() {
     return {
@@ -45,12 +42,15 @@ export default {
     };
   },
   created: function() {
+    ipcRenderer.send('electron-window-size', 350, 165);
     this.nestToken = store.get('NestToken');
     this.getAllThermostat();
+    const updateTask = Cron.schedule('*/15 * * * *', () => this.getAllThermostat(false));
+    updateTask.start();
   },
   methods: {
-    getAllThermostat() {
-      this.loading = true;
+    getAllThermostat(setloading = true) {
+      this.loading = setloading;
       NestService.getAll(this.nestToken).then(resp => {
         this.nestResponse = resp.data;
         this.hvac_state = this.nestResponse.devices.thermostats[Configuration.NestThermostatId].hvac_state;
@@ -60,27 +60,33 @@ export default {
         this.lowSetPoint = this.target_temperature_low_f;
         this.highSetPoint = this.target_temperature_high_f;
         // Send message from renderer process to main process through channel vue
-        ipcRenderer.send('update-tray-temp', `${this.ambient_temperature_f}℉`);
+        let hvac_symbol = ''
+        switch(this.hvac_state) {
+          case 'heating':
+            hvac_symbol = '☼';
+            break;
+          case 'cooling':
+            hvac_symol = '❄︎';
+            break;
+          default:
+            hvac_symbol = '✓';
+            break;
+        }
+        ipcRenderer.send('update-tray-temp', `${hvac_symbol}${this.ambient_temperature_f}℉`);
         this.loading = false;
       }).catch(e => console.log(e));
     },
-    updateSetPointLow() {
+    sendUpdate() {
+      //TODO: Error handling
       this.loading = true;
+      const self = this;
       NestService.updateSetPoint(this.nestToken, {
+        target_temperature_high_f: Number(this.highSetPoint),
         target_temperature_low_f: Number(this.lowSetPoint)
       }).then(resp => {
         if(resp.status === 200) {
-          this.getAllThermostat();
-        }
-      }).catch(e => console.log(e));
-    },
-    updateSetPointHigh() {
-      this.loading = true;
-      NestService.updateSetPoint(this.nestToken, {
-        target_temperature_high_f: Number(this.highSetPoint)
-      }).then(resp => {
-        if(resp.status === 200) {
-          this.getAllThermostat();
+          this.loading = false;
+          setTimeout(function() { self.getAllThermostat(false) }, 5000);
         }
       }).catch(e => console.log(e));
     }
@@ -98,15 +104,23 @@ export default {
     opacity: 0.5;
   }
 
+  .heating {
+    background-color: #FFE1C7;
+  }
+
+  .cooling {
+    background-color: #C7E7FF;
+  }
+
   input {
     border: none;
     border-color: transparent;
-    font-size: 25px;
+    font-size: 30px;
+    font-weight: 600;
+    width: 70px;
   }
 
   input:focus {
     outline: none;
   }
-  
-
 </style>

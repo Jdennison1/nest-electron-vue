@@ -72,7 +72,11 @@ ipcMain.on('update-tray-temp', (event, arg) => {
   tray.setTitle(arg);
 });
 
-ipcMain.on('nest-auth-complete', () => mainWindow.hide())
+ipcMain.on('nest-auth-complete', () => mainWindow.hide());
+
+ipcMain.on('electron-window-size', (event, width, height) => {
+  mainWindow.setSize(width, height);
+});
 
 const toggleWindow = () => {
   if (mainWindow.isVisible()) {
