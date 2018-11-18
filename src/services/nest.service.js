@@ -4,7 +4,7 @@ const qs = require('querystring');
 
 const axios = Axios.create({
   baseURL: 'https://developer-api.nest.com',
-  timeout: 5000
+  timeout: 15000
 });
 
 export default {
