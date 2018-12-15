@@ -3,12 +3,25 @@
     <div v-bind:class="{inactive: loading, cooling: hvac_state === 'cooling', heating: hvac_state === 'heating'}">
       <p style="position: absolute; top: 0; left: 3px; font-size: 14px;">{{thermostatLocation}}</p>
       <p style="font-size: 46px; text-align: center;">{{ambient_temperature_f}}℉</p>
-      <div class="row mx-0">
+      <!--HVAC HEAT & COOL MODE-->
+      <div v-if="hvac_mode === 'heat-cool'" class="row mx-0">
         <div class="col-6 px-0">
           <input type='text' v-model="lowSetPoint" style="color: #FF8247" v-bind:class="{cooling: hvac_state === 'cooling', heating: hvac_state === 'heating'}"/>
         </div>
         <div class="col-6 px-0">
           <input type='text' v-model="highSetPoint" style="color: #0BB5FF" v-bind:class="{cooling: hvac_state === 'cooling', heating: hvac_state === 'heating'}"/>
+        </div>
+      </div>
+      <!--HVAC HEAT MODE-->
+      <div v-if="hvac_mode === 'heat'" class="row mx-0">
+        <div class="col-12 px-0">
+          <input type='text' v-model="lowSetPoint" style="color: #FF8247" v-bind:class="{heating: hvac_state === 'heating'}"/>
+        </div>
+      </div>
+      <!--HVAC COOL MODE-->
+      <div v-if="hvac_mode === 'cool'" class="row mx-0">
+        <div class="col-12 px-0">
+          <input type='text' v-model="highSetPoint" style="color: #0BB5FF" v-bind:class="{cooling: hvac_state === 'cooling'}"/>
         </div>
       </div>
       <button class="btn btn-success btn-md" style="width: 100%; margin-top: 5px; border-radius: 0px !important;" v-on:click="sendUpdate()">Update Thermostat Setpoint</button>
@@ -42,6 +55,7 @@ export default {
       target_temperature_high_f: '--',
       target_temperature_low_f: '--',
       thermostatLocation: '--',
+      hvac_mode: '--',
       nestToken: ''
     };
   },
@@ -62,6 +76,7 @@ export default {
         this.ambient_temperature_f = this.nestResponse.devices.thermostats[Configuration.NestThermostatId].ambient_temperature_f;
         this.target_temperature_high_f = this.nestResponse.devices.thermostats[Configuration.NestThermostatId].target_temperature_high_f;
         this.target_temperature_low_f = this.nestResponse.devices.thermostats[Configuration.NestThermostatId].target_temperature_low_f;
+        this.hvac_mode = this.nestResponse.devices.thermostats[Configuration.NestThermostatId].hvac_mode;
         this.lowSetPoint = this.target_temperature_low_f;
         this.highSetPoint = this.target_temperature_high_f;
         // Send message from renderer process to main process through channel vue
