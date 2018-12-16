@@ -41,5 +41,13 @@ export default {
         'Content-Type': `application/json`
       }
     });
+  },
+  updateHvacMode: (token, mode) => {
+    return axios.put(`/devices/thermostats/${Configuration.NestThermostatId}`, {hvac_mode: String(mode)}, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': `application/json`
+      }
+    });
   }
 };
