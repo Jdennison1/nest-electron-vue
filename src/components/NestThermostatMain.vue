@@ -3,6 +3,13 @@
     <div v-bind:class="{inactive: loading, cooling: hvac_state === 'cooling', heating: hvac_state === 'heating'}">
       <p style="position: absolute; top: 0; left: 3px; font-size: 14px;">{{thermostatLocation}}</p>
       <p style="font-size: 46px; text-align: center;">{{ambient_temperature_f}}℉</p>
+      <select style="position: absolute; top: 3px; right: 3px;" @change="onHvacModeChange()" v-model="hvac_mode">
+        <option value="--"> -- </option>
+        <option value="heat"> Heat </option>
+        <option value="cool"> Cool </option>
+        <option vaue="heat-cool"> Heat/Cool </option>
+      </select>
+
       <!--HVAC HEAT & COOL MODE-->
       <div v-if="hvac_mode === 'heat-cool'" class="row mx-0">
         <div class="col-6 px-0">
@@ -12,12 +19,14 @@
           <input type='text' v-model="highSetPoint" style="color: #0BB5FF" v-bind:class="{cooling: hvac_state === 'cooling', heating: hvac_state === 'heating'}"/>
         </div>
       </div>
+
       <!--HVAC HEAT MODE-->
       <div v-if="hvac_mode === 'heat'" class="row mx-0">
         <div class="col-12 px-0">
           <input type='text' v-model="lowSetPoint" style="color: #FF8247" v-bind:class="{heating: hvac_state === 'heating'}"/>
         </div>
       </div>
+
       <!--HVAC COOL MODE-->
       <div v-if="hvac_mode === 'cool'" class="row mx-0">
         <div class="col-12 px-0">
@@ -56,7 +65,7 @@ export default {
       target_temperature_low_f: '--',
       thermostatLocation: '--',
       hvac_mode: '--',
-      nestToken: ''
+      nestToken: '',
     };
   },
   created: function() {
@@ -100,15 +109,35 @@ export default {
       //TODO: Error handling
       this.loading = true;
       const self = this;
-      NestService.updateSetPoint(this.nestToken, {
-        target_temperature_high_f: Number(this.highSetPoint),
-        target_temperature_low_f: Number(this.lowSetPoint)
-      }).then(resp => {
+      let req = { };
+
+      switch(this.hvac_mode) {
+        case 'heat':
+        case 'cool':
+          req = { target_temperature_f: Number(this.highSetPoint) };
+          break;
+        case 'heat-cool':
+          req = {
+            target_temperature_high_f: Number(this.highSetPoint),
+            target_temperature_low_f: Number(this.lowSetPoint)
+          };
+          break;
+        default:
+          // should never get here
+          console.error('unexpected hvac_mode when sending setpoint update');
+          return;
+      }
+
+      NestService.updateSetPoint(this.nestToken, req).then(resp => {
         if(resp.status === 200) {
           this.loading = false;
           setTimeout(function() { self.getAllThermostat(false) }, 5000);
         }
       }).catch(e => console.log(e));
+    },
+    onHvacModeChange() {
+      // TODO: Impl.
+      alert("Mode changed to: " + this.hvac_mode);
     }
   }
 }
