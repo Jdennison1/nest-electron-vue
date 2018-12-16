@@ -113,6 +113,8 @@ export default {
 
       switch(this.hvac_mode) {
         case 'heat':
+          req = { target_temperature_f: Number(this.lowSetPoint) };
+          break;
         case 'cool':
           req = { target_temperature_f: Number(this.highSetPoint) };
           break;
