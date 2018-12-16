@@ -136,8 +136,14 @@ export default {
       }).catch(e => console.log(e));
     },
     onHvacModeChange() {
-      // TODO: Impl.
-      alert("Mode changed to: " + this.hvac_mode);
+      this.loading = true;
+      const self = this;
+      NestService.updateHvacMode(this.nestToken, this.hvac_mode).then(resp => {
+        if(resp.status === 200) {
+          this.loading = false;
+          setTimeout(function() { self.getAllThermostat(false) }, 5000);
+        }
+      }).catch(e => console.log(e));
     }
   }
 }
