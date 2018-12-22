@@ -1,10 +1,9 @@
 <template>
   <div>
     <div v-bind:class="{inactive: loading, cooling: hvac_state === 'cooling', heating: hvac_state === 'heating'}">
-      <p style="position: absolute; top: 0; left: 3px; font-size: 14px;">{{thermostatLocation}}</p>
-      <p style="font-size: 46px; text-align: center;">{{ambient_temperature_f}}℉</p>
+      <p style="position: absolute; top: 0; left: 3px; font-size: 14px;">{{thermostatLocation}}: {{ambient_temperature_f}}℉</p>
       <select style="position: absolute; top: 3px; right: 3px;" @change="onHvacModeChange()" v-model="hvac_mode">
-        <option value="--"> -- </option>
+        <option value="--" disabled> -- </option>
         <option value="heat"> Heat </option>
         <option value="cool"> Cool </option>
         <option vaue="heat-cool"> Heat/Cool </option>
@@ -33,7 +32,7 @@
           <input type='text' v-model="targetSetPoint" style="color: #0BB5FF" v-bind:class="{cooling: hvac_state === 'cooling'}"/>
         </div>
       </div>
-      <button class="btn btn-success btn-md" style="width: 100%; margin-top: 5px; border-radius: 0px !important;" v-on:click="sendUpdate()">Update Thermostat Setpoint</button>
+      <button class="btn btn-success btn-md" style="position: absolute; bottom: 0; width: 100%; margin-top: 5px; border-radius: 0px !important;" v-on:click="sendUpdate()">Update Thermostat Setpoint</button>
     </div>
     <cube-shadow v-if="loading" background="#5CB85C" style="position: absolute; top: 70px; left: 154px;"></cube-shadow>
   </div>
@@ -70,7 +69,7 @@ export default {
     };
   },
   created: function() {
-    ipcRenderer.send('electron-window-size', 350, 175);
+    ipcRenderer.send('electron-window-size', 350, 150);
     this.nestToken = store.get('NestToken');
     this.getAllThermostat();
     const updateTask = Cron.schedule('*/15 * * * *', () => this.getAllThermostat(false));
@@ -174,10 +173,16 @@ export default {
   input {
     border: none;
     border-color: transparent;
-    font-size: 30px;
+    font-size: 50px;
     font-weight: 600;
     width: 100%;
     text-align: center;
+    background: transparent;
+    margin-top: 28px;
+  }
+
+  select {
+    z-index: 1000;
   }
 
   input:focus {
