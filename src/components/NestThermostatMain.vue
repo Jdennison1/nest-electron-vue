@@ -23,14 +23,14 @@
       <!--HVAC HEAT MODE-->
       <div v-if="hvac_mode === 'heat'" class="row mx-0">
         <div class="col-12 px-0">
-          <input type='text' v-model="lowSetPoint" style="color: #FF8247" v-bind:class="{heating: hvac_state === 'heating'}"/>
+          <input type='text' v-model="targetSetPoint" style="color: #FF8247" v-bind:class="{heating: hvac_state === 'heating'}"/>
         </div>
       </div>
 
       <!--HVAC COOL MODE-->
       <div v-if="hvac_mode === 'cool'" class="row mx-0">
         <div class="col-12 px-0">
-          <input type='text' v-model="highSetPoint" style="color: #0BB5FF" v-bind:class="{cooling: hvac_state === 'cooling'}"/>
+          <input type='text' v-model="targetSetPoint" style="color: #0BB5FF" v-bind:class="{cooling: hvac_state === 'cooling'}"/>
         </div>
       </div>
       <button class="btn btn-success btn-md" style="width: 100%; margin-top: 5px; border-radius: 0px !important;" v-on:click="sendUpdate()">Update Thermostat Setpoint</button>
@@ -59,6 +59,7 @@ export default {
       nestResponse: { },
       lowSetPoint: undefined,
       highSetPoint: undefined,
+      targetSetPoint: undefined,
       hvac_state: '--',
       ambient_temperature_f: '--',
       target_temperature_high_f: '--',
@@ -88,6 +89,7 @@ export default {
         this.hvac_mode = this.nestResponse.devices.thermostats[Configuration.NestThermostatId].hvac_mode;
         this.lowSetPoint = this.target_temperature_low_f;
         this.highSetPoint = this.target_temperature_high_f;
+        this.targetSetPoint = this.nestResponse.devices.thermostats[Configuration.NestThermostatId].target_temperature_f;
         // Send message from renderer process to main process through channel vue
         let hvac_symbol = ''
         switch(this.hvac_state) {
@@ -113,10 +115,10 @@ export default {
 
       switch(this.hvac_mode) {
         case 'heat':
-          req = { target_temperature_f: Number(this.lowSetPoint) };
+          req = { target_temperature_f: Number(this.targetSetPoint) };
           break;
         case 'cool':
-          req = { target_temperature_f: Number(this.highSetPoint) };
+          req = { target_temperature_f: Number(this.targetSetPoint) };
           break;
         case 'heat-cool':
           req = {
