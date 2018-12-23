@@ -4,6 +4,8 @@
 const {app, BrowserWindow, Tray, ipcMain, nativeImage} = require('electron');
 const Store = require('electron-store');
 const store = new Store();
+const path = require('path');
+const isWin = process.platform === 'win32';
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -19,7 +21,7 @@ function createWindow () {
     resizable: false,
     show: !store.has('NestToken')
   });
-  let icon = nativeImage.createEmpty()
+  let icon = isWin ? nativeImage.createFromPath(path.join(__dirname, 'src/assets/thermometerIcon.png')) : nativeImage.createEmpty();
   tray = new Tray(icon);
   tray.setTitle('--℉');
 
@@ -87,18 +89,21 @@ const toggleWindow = () => {
 }
 
 const showWindow = () => {
-  const trayPos = tray.getBounds()
-  const windowPos = mainWindow.getBounds()
-  let x, y = 0
-  if (process.platform == 'darwin') {
-    x = Math.round(trayPos.x + (trayPos.width / 2) - (windowPos.width / 2))
-    y = Math.round(trayPos.y + trayPos.height)
-  } else {
-    x = Math.round(trayPos.x + (trayPos.width / 2) - (windowPos.width / 2))
-    y = Math.round(trayPos.y + trayPos.height * 10)
+  if(!isWin) {
+    const trayPos = tray.getBounds();
+    const windowPos = mainWindow.getBounds();
+    let x, y = 0;
+    if (process.platform == 'darwin') {
+      x = Math.round(trayPos.x + (trayPos.width / 2) - (windowPos.width / 2));
+      y = Math.round(trayPos.y + trayPos.height);
+    } else {
+      x = Math.round(trayPos.x + (trayPos.width / 2) - (windowPos.width / 2));
+      y = Math.round(trayPos.y + trayPos.height * 10);
+    }
+
+    mainWindow.setPosition(x, y, false);
   }
 
-  mainWindow.setPosition(x, y, false)
-  mainWindow.show()
-  mainWindow.focus()
+  mainWindow.show();
+  mainWindow.focus();
 }
