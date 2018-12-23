@@ -6,7 +6,7 @@
         <option value="--" disabled> -- </option>
         <option value="heat"> Heat </option>
         <option value="cool"> Cool </option>
-        <option vaue="heat-cool"> Heat/Cool </option>
+        <option value="heat-cool"> Heat/Cool </option>
       </select>
 
       <!--HVAC HEAT & COOL MODE-->
