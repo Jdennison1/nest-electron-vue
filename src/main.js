@@ -4,6 +4,9 @@ import App from './App.vue';
 import NestThermostatMain from './components/NestThermostatMain.vue';
 import NestAuthorization from './components/NestAuthorization.vue';
 
+window.$ = window.jQuery = require('jquery');
+window.Bootstrap = require('bootstrap');
+
 Vue.use(VueRouter);
 Vue.config.productionTip = false;
 
