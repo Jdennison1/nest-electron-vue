@@ -33,6 +33,7 @@
           <input type='text' v-model="targetSetPoint" style="color: #0BB5FF" v-bind:class="{cooling: hvac_state === 'cooling'}"/>
         </div>
       </div>
+      <div v-if="timeToTarget !== '~0'" style="position: absolute; top: 84px; left: 124px; color: #888">in {{timeToTarget}} minutes</div>
       <button class="btn btn-success btn-md" style="position: absolute; bottom: 0; width: 100%; margin-top: 5px; border-radius: 0px !important;" v-on:click="sendUpdate()">Update Thermostat Setpoint</button>
     </div>
     <cube-shadow v-if="loading" background="#5CB85C" style="position: absolute; top: 70px; left: 154px;"></cube-shadow>
@@ -60,6 +61,7 @@ export default {
       lowSetPoint: undefined,
       highSetPoint: undefined,
       targetSetPoint: undefined,
+      timeToTarget: '~0',
       hvac_state: '--',
       ambient_temperature_f: '--',
       target_temperature_high_f: '--',
@@ -94,6 +96,8 @@ export default {
         this.targetSetPoint = this.nestResponse.devices.thermostats[Configuration.NestThermostatId].target_temperature_f;
         this.humidity = this.nestResponse.devices.thermostats[Configuration.NestThermostatId].humidity;
         this.leaf = this.nestResponse.devices.thermostats[Configuration.NestThermostatId].has_leaf;
+        this.timeToTarget = this.nestResponse.devices.thermostats[Configuration.NestThermostatId].time_to_target;
+        
         // Send message from renderer process to main process through channel vue
         let hvac_symbol = ''
         switch(this.hvac_state) {
