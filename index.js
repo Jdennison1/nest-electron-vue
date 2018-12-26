@@ -21,6 +21,7 @@ function createWindow () {
     resizable: false,
     show: !store.has('NestToken')
   });
+  
   let icon = isWin ? nativeImage.createFromPath(path.join(__dirname, 'src/assets/thermometerIcon.png')) : nativeImage.createEmpty();
   tray = new Tray(icon);
   tray.setTitle('--℉');
