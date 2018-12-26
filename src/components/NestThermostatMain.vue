@@ -1,7 +1,8 @@
 <template>
   <div>
     <div v-bind:class="{inactive: loading, cooling: hvac_state === 'cooling', heating: hvac_state === 'heating'}">
-      <p style="position: absolute; top: 0; left: 3px; font-size: 14px;">{{thermostatLocation}}: {{ambient_temperature_f}}℉</p>
+      <p style="position: absolute; top: 0; left: 3px; font-size: 14px;">{{thermostatLocation}}: {{ambient_temperature_f}}℉ | {{humidity}}%</p>
+      <img v-if="leaf" style="position: absolute; top: 22px; left: 3px;" src="../assets/leafIcon16.png"/>
       <select style="position: absolute; top: 3px; right: 3px;" @change="onHvacModeChange()" v-model="hvac_mode">
         <option value="--" disabled> -- </option>
         <option value="heat"> Heat </option>
@@ -63,9 +64,11 @@ export default {
       ambient_temperature_f: '--',
       target_temperature_high_f: '--',
       target_temperature_low_f: '--',
+      humidity: '--',
       thermostatLocation: '--',
       hvac_mode: '--',
       nestToken: '',
+      leaf: false
     };
   },
   created: function() {
@@ -89,6 +92,8 @@ export default {
         this.lowSetPoint = this.target_temperature_low_f;
         this.highSetPoint = this.target_temperature_high_f;
         this.targetSetPoint = this.nestResponse.devices.thermostats[Configuration.NestThermostatId].target_temperature_f;
+        this.humidity = this.nestResponse.devices.thermostats[Configuration.NestThermostatId].humidity;
+        this.leaf = this.nestResponse.devices.thermostats[Configuration.NestThermostatId].has_leaf;
         // Send message from renderer process to main process through channel vue
         let hvac_symbol = ''
         switch(this.hvac_state) {
