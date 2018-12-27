@@ -3,12 +3,17 @@
     <div v-bind:class="{inactive: loading, cooling: hvac_state === 'cooling', heating: hvac_state === 'heating'}">
       <p style="position: absolute; top: 0; left: 3px; font-size: 14px;">{{thermostatLocation}}: {{ambient_temperature_f}}℉ | {{humidity}}%</p>
       <img v-if="leaf" style="position: absolute; top: 22px; left: 3px;" src="../assets/leafIcon16.png"/>
-      <select style="position: absolute; top: 3px; right: 3px;" @change="onHvacModeChange()" v-model="hvac_mode">
-        <option value="--" disabled> -- </option>
-        <option value="heat"> Heat </option>
-        <option value="cool"> Cool </option>
-        <option value="heat-cool"> Heat/Cool </option>
-      </select>
+      
+      <div class="dropdown top-dropdown">
+        <button style="position: absolute; top: 3px; right: 3px;" class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Mode: {{hvac_mode | capitalize}}
+        </button>
+        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+          <a class="dropdown-item" @click="onHvacModeChange('heat')">Heat</a>
+          <a class="dropdown-item" @click="onHvacModeChange('cool')">Cool</a>
+          <a class="dropdown-item" @click="onHvacModeChange('heat-cool')">Heat/Cool</a>
+        </div>
+      </div>
 
       <!--HVAC HEAT & COOL MODE-->
       <div v-if="hvac_mode === 'heat-cool'" class="row mx-0">
@@ -74,7 +79,7 @@ export default {
     };
   },
   created: function() {
-    ipcRenderer.send('electron-window-size', 350, 150);
+    ipcRenderer.send('electron-window-size', 350, 143);
     this.nestToken = store.get('NestToken');
     this.getAllThermostat();
     const updateTask = Cron.schedule('*/15 * * * *', () => this.getAllThermostat(false));
@@ -147,15 +152,23 @@ export default {
         }
       }).catch(e => console.log(e));
     },
-    onHvacModeChange() {
+    onHvacModeChange(mode) {
       this.loading = true;
       const self = this;
+      this.hvac_mode = mode;
       NestService.updateHvacMode(this.nestToken, this.hvac_mode).then(resp => {
         if(resp.status === 200) {
           this.loading = false;
           setTimeout(function() { self.getAllThermostat(false) }, 5000);
         }
       }).catch(e => console.log(e));
+    }
+  },
+  filters: {
+    capitalize: function (value) {
+      if (!value) return ''
+      value = value.toString()
+      return value.charAt(0).toUpperCase() + value.slice(1)
     }
   }
 }
@@ -177,6 +190,10 @@ export default {
 
   .cooling {
     background-color: #C7E7FF;
+  }
+
+  .top-dropdown {
+    z-index: 1000;
   }
 
   input {
