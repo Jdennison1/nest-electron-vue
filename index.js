@@ -19,7 +19,8 @@ function createWindow () {
     height: 300,
     frame: false,
     resizable: false,
-    show: !store.has('NestToken')
+    show: !store.has('NestToken'),
+    alwaysOnTop: true
   });
   
   let icon = isWin ? nativeImage.createFromPath(path.join(__dirname, 'src/assets/thermometerIcon.png')) : nativeImage.createEmpty();
