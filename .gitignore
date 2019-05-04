@@ -23,3 +23,6 @@ yarn-error.log*
 
 # Config File
 app.config.js
+
+# Build Directories
+NestController-darwin-x64

@@ -5,7 +5,7 @@
   "scripts": {
     "start": "electron .",
     "build": "vue-cli-service build",
-    "package-mac": "electron-packager . NestController --platform darwin --arch x64 --icon ./public/macIcon128.icns"
+    "package-mac": "electron-packager . NestController --platform darwin --arch x64 --icon ./public/macIcon.icns"
   },
   "dependencies": {
     "axios": "^0.18.0",
